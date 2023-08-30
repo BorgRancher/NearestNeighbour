@@ -90,6 +90,9 @@ namespace ClosestCommonNeighbour
             Console.WriteLine(message);
         }
 
+        /**
+         * Use batch-loading to speed up the process.
+         */
         private static async Task LoadBinaryFileToDictionaryAsync()
         {
             var fileLoading = new Stopwatch();
@@ -142,44 +145,6 @@ namespace ClosestCommonNeighbour
             var recordedTime = reader.ReadUInt64();
 
             return new Vehicle(id, registration, latitude, longitude, recordedTime);
-        }
-
-       
-
-
-        private static void LoadBinaryFileToDictionary()
-        {
-            var fileLoading = new Stopwatch();
-            fileLoading.Start();
-
-            using (BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open)))
-            {
-                while (reader.BaseStream.Position != reader.BaseStream.Length)
-                {
-                    // Read a record from the file
-                    var vehiclePosition = ReadBinaryVehicle(reader);
-                    // LogObjectProperties(vehiclePosition);
-                    vehicleDict.TryAdd(vehiclePosition.Id, new VehicleEntry(vehiclePosition.Id, vehiclePosition.Registration, new Vector2(vehiclePosition.Latitude, vehiclePosition.Longitude), vehiclePosition.RecordedTimeUTC));
-                }
-            }
-
-            fileLoading.Stop();
-
-            var message = $"File read & loaded {vehicleDict.Count} records: {fileLoading.ElapsedMilliseconds} ms.";
-            Console.WriteLine(message);
-        }
-
-        private static Vehicle ReadBinaryVehicle(BinaryReader reader)
-        {
-            var id = reader.ReadInt32();
-            var registration = ReadNullTerminatedString(reader);
-            var latitude = reader.ReadSingle();
-            var longitude = reader.ReadSingle();
-            var recordedTime = reader.ReadUInt64();
-
-            return new Vehicle(id, registration, latitude, longitude, recordedTime);
-
-
         }
 
         public static string ReadNullTerminatedString(BinaryReader reader)
